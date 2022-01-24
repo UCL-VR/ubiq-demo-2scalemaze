@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 6e979a62dd19f4758b894c4c659b3944
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - torch_prefab: {fileID: 6085184999979999916, guid: 57c7f472e9a4947e09fe22cf132e40de,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
