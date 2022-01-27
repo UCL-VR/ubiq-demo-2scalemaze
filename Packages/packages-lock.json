@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.ucl.ubiq": {
-      "version": "file:ubiq-0.2.0-alpha.3",
+      "version": "file:ubiq-0.2.0-alpha.4",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
