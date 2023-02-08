@@ -59,7 +59,7 @@ public class Tile : MonoBehaviour, IGraspable //,IUseable
         }
 
         // Prevent grabbing a tile if somebody's head is inisde it.
-        MazeAvatar[] avatars = NetworkScene.FindNetworkScene(this).GetComponentsInChildren<MazeAvatar>();
+        MazeAvatar[] avatars = NetworkScene.Find(this).GetComponentsInChildren<MazeAvatar>();
         foreach (MazeAvatar avatar in avatars)
         {
             if (GetComponent<Collider>().bounds.Contains(avatar.headPosition))

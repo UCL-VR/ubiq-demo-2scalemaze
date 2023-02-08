@@ -6,7 +6,7 @@ using Ubiq.Messaging;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Box : MonoBehaviour, INetworkObject, INetworkComponent
+public class Box : MonoBehaviour
 {
     public int sideNumb = 3;
     public float z_offset = 0.3f;
@@ -77,7 +77,7 @@ public class Box : MonoBehaviour, INetworkObject, INetworkComponent
         // Keep a reference to the network
         ctx = NetworkScene.Register(this);
         // Get a reference to the room client
-        client = ctx.scene.GetComponentInChildren<RoomClient>();
+        client = ctx.Scene.GetComponentInChildren<RoomClient>();
         // Register for Peer events
         client.OnPeerAdded.AddListener(OnPeerAdded);
         // Give ourselves a player ID
@@ -117,7 +117,7 @@ public class Box : MonoBehaviour, INetworkObject, INetworkComponent
 
     private void OnPeerAdded(IPeer peer)
     {
-        if (peer.UUID == client.Me.UUID)
+        if (peer.uuid == client.Me.uuid)
         {
             return;
         }

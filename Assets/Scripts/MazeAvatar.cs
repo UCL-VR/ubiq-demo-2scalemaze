@@ -7,9 +7,6 @@ using Ubiq.Avatars;
 using UnityEngine.SceneManagement;
 using Ubiq.Samples;
 
-[RequireComponent(typeof(Ubiq.Avatars.Avatar))]
-[RequireComponent(typeof(FloatingAvatar))]
-[RequireComponent(typeof(ThreePointTrackedAvatar))]
 public class MazeAvatar : MonoBehaviour
 {
     public bool avatarIsBig { get; private set; }
@@ -36,14 +33,14 @@ public class MazeAvatar : MonoBehaviour
     private void Awake()
     {
         avatar = GetComponent<Ubiq.Avatars.Avatar>();
-        floatingAvatar = GetComponent<FloatingAvatar>();
+        floatingAvatar = GetComponentInChildren<FloatingAvatar>();
         threePointTrackedAvatar = GetComponent<ThreePointTrackedAvatar>();
     }
 
     private void Start()
     {
         // Grab a reference to the necessary transforms
-        sameTransform = NetworkScene.FindNetworkScene(this).transform;
+        sameTransform = NetworkScene.Find(this).transform;
         insideTransform = GameObject.Find("InsideOrigin").transform;
         outsideTransform = GameObject.Find("OutsideOrigin").transform;
 

@@ -15,7 +15,7 @@ public class goToInside : MonoBehaviour, IGraspable
 
     private void Start ()
     {
-        roomClient = NetworkScene.FindNetworkScene(this).
+        roomClient = NetworkScene.Find(this).
             GetComponentInChildren<RoomClient>();
     }
 

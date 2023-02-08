@@ -5,6 +5,10 @@ using Ubiq.Voip;
 using Ubiq.Messaging;
 using Ubiq.Avatars;
 
+#if UNITY_EDITOR || !UNITY_WEBGL
+using Ubiq.Voip.Implementations.Dotnet;
+#endif
+
 [RequireComponent(typeof(MazeAvatar))]
 public class MazeVoipAvatar : MonoBehaviour
 {
@@ -17,23 +21,25 @@ public class MazeVoipAvatar : MonoBehaviour
     private void Awake()
     {
         mazeAvatar = GetComponent<MazeAvatar>();
-        voipAvatar = GetComponent<VoipAvatar>();
+        voipAvatar = GetComponentInChildren<VoipAvatar>();
     }
 
     private void LateUpdate()
     {
+#if UNITY_EDITOR || !UNITY_WEBGL
         if (voipAvatar && voipAvatar.peerConnection != null)
         {
-            var audioSource = voipAvatar.peerConnection.audioSink.unityAudioSource;
-            audioSource.dopplerLevel = 0;
-            if (mazeAvatar.avatarIsBig)
+            var pc = voipAvatar.peerConnection;
+            var sink = pc.GetComponentInChildren<IDotnetVoipSink>() as AudioSourceDotnetVoipSink;
+            if (sink != null)
             {
-                audioSource.minDistance = audioFalloffMinDistanceForBigAvatars;
-            }
-            else
-            {
-                audioSource.minDistance = audioFalloffMinDistance;
+                var unitySink = sink.unityAudioSource;
+                unitySink.dopplerLevel = 0;
+                unitySink.minDistance = mazeAvatar.avatarIsBig
+                    ? audioFalloffMinDistanceForBigAvatars
+                    : audioFalloffMinDistance;
             }
         }
+#endif
     }
 }
