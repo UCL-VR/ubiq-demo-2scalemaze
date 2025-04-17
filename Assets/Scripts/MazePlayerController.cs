@@ -1,24 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Ubiq.XR;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Movement;
 
-[RequireComponent(typeof(XRPlayerController))]
 public class MazePlayerController : MonoBehaviour
 {
+    public List<ContinuousMoveProvider> moveProviders;
     public float insideMazeFlySpeed = 2.6f;
     public float outsideMazeFlySpeed = 1.2f;
 
     public GameObject ui;
 
-    private XRPlayerController playerController;
-
-    private void Awake ()
+    private void Start ()
     {
-        playerController = GetComponent<XRPlayerController>();
-
         SceneManager.sceneLoaded += OnSceneLoaded;
+        OnSceneLoaded(SceneManager.GetActiveScene(),LoadSceneMode.Single);
     }
 
     private void OnDestroy ()
@@ -28,17 +24,19 @@ public class MazePlayerController : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (!playerController)
-        {
-            return;
-        }
-
+        
         // When the local player changes scene, update this static reference
         if (scene.name == "Inside_scene") {
-            playerController.joystickFlySpeed = insideMazeFlySpeed;
+            for (int i = 0; i < moveProviders.Count; i++)
+            {
+                moveProviders[i].moveSpeed = insideMazeFlySpeed;
+            }
             ui.SetActive(false);
         } else {
-            playerController.joystickFlySpeed = outsideMazeFlySpeed;
+            for (int i = 0; i < moveProviders.Count; i++)
+            {
+                moveProviders[i].moveSpeed = outsideMazeFlySpeed;
+            }
             ui.SetActive(true);
         }
     }

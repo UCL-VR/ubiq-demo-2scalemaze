@@ -31,6 +31,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_LoaderManagerInstance: {fileID: -8460263194659644879}
   m_InitManagerOnStart: 1
+--- !u!114 &-4409686734859347450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4c3631f5e58749a59194e0cf6baf6d5, type: 3}
+  m_Name: WebGL Providers
+  m_EditorClassIdentifier: 
+  m_RequiresSettingsUpdate: 0
+  m_AutomaticLoading: 0
+  m_AutomaticRunning: 0
+  m_Loaders:
+  - {fileID: 11400000, guid: f68bad104598f6b48958f57ac88f210e, type: 2}
 --- !u!114 &-1323566568170607485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,10 +77,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2dc886499c26824283350fa532d087d, type: 3}
   m_Name: XRGeneralSettings
   m_EditorClassIdentifier: 
-  Keys: 0700000001000000
+  Keys: 07000000010000000d000000
   Values:
   - {fileID: 1943178580648115312}
   - {fileID: -8078637908154552809}
+  - {fileID: 4330700711099713378}
 --- !u!114 &1943178580648115312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,4 +95,18 @@ MonoBehaviour:
   m_Name: Android Settings
   m_EditorClassIdentifier: 
   m_LoaderManagerInstance: {fileID: -1323566568170607485}
+  m_InitManagerOnStart: 1
+--- !u!114 &4330700711099713378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d236b7d11115f2143951f1e14045df39, type: 3}
+  m_Name: WebGL Settings
+  m_EditorClassIdentifier: 
+  m_LoaderManagerInstance: {fileID: -4409686734859347450}
   m_InitManagerOnStart: 1

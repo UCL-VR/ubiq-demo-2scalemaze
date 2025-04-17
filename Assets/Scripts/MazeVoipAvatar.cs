@@ -1,13 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Ubiq.Avatars;
 using UnityEngine;
 using Ubiq.Voip;
 using Ubiq.Messaging;
-using Ubiq.Avatars;
-
-#if UNITY_EDITOR || !UNITY_WEBGL
-using Ubiq.Voip.Implementations.Dotnet;
-#endif
+using Avatar = Ubiq.Avatars.Avatar;
 
 [RequireComponent(typeof(MazeAvatar))]
 public class MazeVoipAvatar : MonoBehaviour
@@ -15,31 +12,60 @@ public class MazeVoipAvatar : MonoBehaviour
     public float audioFalloffMinDistance = 1.0f;
     public float audioFalloffMinDistanceForBigAvatars = 50.0f;
 
+    private Avatar avatar;
     private MazeAvatar mazeAvatar;
     private VoipAvatar voipAvatar;
+    private VoipAvatar localVoipAvatar;
+    private AvatarManager avatarManager;
 
     private void Awake()
     {
+        avatarManager = GetComponentInParent<AvatarManager>();
+        avatar = GetComponent<Avatar>();
         mazeAvatar = GetComponent<MazeAvatar>();
         voipAvatar = GetComponentInChildren<VoipAvatar>();
     }
 
     private void LateUpdate()
     {
-#if UNITY_EDITOR || !UNITY_WEBGL
-        if (voipAvatar && voipAvatar.peerConnection != null)
+        if (!voipAvatar || !voipAvatar.peerConnection)
         {
-            var pc = voipAvatar.peerConnection;
-            var sink = pc.GetComponentInChildren<IDotnetVoipSink>() as AudioSourceDotnetVoipSink;
-            if (sink != null)
+            return;
+        }
+        
+        if (!avatarManager || !avatarManager || !avatarManager.LocalAvatar)
+        {
+            return;
+        }
+        
+        if (!localVoipAvatar)
+        {
+            if (avatar && avatar.IsLocal)
             {
-                var unitySink = sink.unityAudioSource;
-                unitySink.dopplerLevel = 0;
-                unitySink.minDistance = mazeAvatar.avatarIsBig
-                    ? audioFalloffMinDistanceForBigAvatars
-                    : audioFalloffMinDistance;
+                localVoipAvatar = voipAvatar;
+            }
+            else
+            {
+                localVoipAvatar = avatarManager.LocalAvatar
+                    .GetComponentInChildren<VoipAvatar>();
             }
         }
-#endif
+
+        if (!localVoipAvatar || localVoipAvatar == voipAvatar)
+        {
+            return;
+        }
+
+        var source = voipAvatar.audioSourcePosition;
+        var listener = localVoipAvatar.audioSourcePosition;
+        var listenerPosition = !mazeAvatar.avatarIsBig
+            ? listener.position
+            : source.position + 
+              (listener.position - source.position) 
+              * (1/audioFalloffMinDistanceForBigAvatars);
+
+        voipAvatar.peerConnection.UpdateSpatialization(
+            source.position,source.rotation,
+            listenerPosition,listener.rotation);
     }
 }

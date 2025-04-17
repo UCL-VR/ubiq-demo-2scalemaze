@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Ubiq;
 using UnityEngine;
 using Ubiq.Voip;
 using Ubiq.Messaging;
@@ -26,7 +27,7 @@ public class MazeAvatar : MonoBehaviour
 
     private Ubiq.Avatars.Avatar avatar;
     private FloatingAvatar floatingAvatar;
-    private ThreePointTrackedAvatar threePointTrackedAvatar;
+    private HeadAndHandsAvatar headAndHandsAvatar;
 
     private bool ignoringEvents;
 
@@ -34,7 +35,7 @@ public class MazeAvatar : MonoBehaviour
     {
         avatar = GetComponent<Ubiq.Avatars.Avatar>();
         floatingAvatar = GetComponentInChildren<FloatingAvatar>();
-        threePointTrackedAvatar = GetComponent<ThreePointTrackedAvatar>();
+        headAndHandsAvatar = GetComponent<HeadAndHandsAvatar>();
     }
 
     private void Start()
@@ -49,18 +50,18 @@ public class MazeAvatar : MonoBehaviour
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        threePointTrackedAvatar.OnHeadUpdate.AddListener(OnHeadUpdate);
-        threePointTrackedAvatar.OnLeftHandUpdate.AddListener(OnLeftHandUpdate);
-        threePointTrackedAvatar.OnRightHandUpdate.AddListener(OnRightHandUpdate);
+        headAndHandsAvatar.OnHeadUpdate.AddListener(OnHeadUpdate);
+        headAndHandsAvatar.OnLeftHandUpdate.AddListener(OnLeftHandUpdate);
+        headAndHandsAvatar.OnRightHandUpdate.AddListener(OnRightHandUpdate);
     }
 
     private void OnDestroy()
     {
-        if (threePointTrackedAvatar)
+        if (headAndHandsAvatar)
         {
-            threePointTrackedAvatar.OnHeadUpdate.RemoveListener(OnHeadUpdate);
-            threePointTrackedAvatar.OnLeftHandUpdate.RemoveListener(OnLeftHandUpdate);
-            threePointTrackedAvatar.OnRightHandUpdate.RemoveListener(OnRightHandUpdate);
+            headAndHandsAvatar.OnHeadUpdate.RemoveListener(OnHeadUpdate);
+            headAndHandsAvatar.OnLeftHandUpdate.RemoveListener(OnLeftHandUpdate);
+            headAndHandsAvatar.OnRightHandUpdate.RemoveListener(OnRightHandUpdate);
         }
     }
 
@@ -74,20 +75,21 @@ public class MazeAvatar : MonoBehaviour
         }
     }
 
-    private void OnHeadUpdate(Vector3 pos, Quaternion rot)
+    private void OnHeadUpdate(InputVar<Pose> head)
     {
-        if (ignoringEvents)
+        if (ignoringEvents || !head.valid)
         {
             return;
         }
 
         var transform = GetWorldTransform();
 
-        pos = transform.TransformPoint(pos);
-        rot = transform.rotation * rot;
+        var pos = transform.TransformPoint(head.value.position);
+        var rot = transform.rotation * head.value.rotation;
 
         ignoringEvents = true;
-        threePointTrackedAvatar.OnHeadUpdate.Invoke(pos,rot);
+        headAndHandsAvatar.OnHeadUpdate.Invoke(
+            new InputVar<Pose>(new Pose(pos,rot)));
         ignoringEvents = false;
 
         floatingAvatar.head.localScale = transform.localScale;
@@ -97,39 +99,41 @@ public class MazeAvatar : MonoBehaviour
         headPosition = pos;
     }
 
-    private void OnLeftHandUpdate(Vector3 pos, Quaternion rot)
+    private void OnLeftHandUpdate(InputVar<Pose> leftHand)
     {
-        if (ignoringEvents)
+        if (ignoringEvents || !leftHand.valid)
         {
             return;
         }
 
         var transform = GetWorldTransform();
 
-        pos = transform.TransformPoint(pos);
-        rot = transform.rotation * rot;
+        var pos = transform.TransformPoint(leftHand.value.position);
+        var rot = transform.rotation * leftHand.value.rotation;
 
         ignoringEvents = true;
-        threePointTrackedAvatar.OnLeftHandUpdate.Invoke(pos,rot);
+        headAndHandsAvatar.OnLeftHandUpdate.Invoke(
+            new InputVar<Pose>(new Pose(pos,rot)));
         ignoringEvents = false;
 
         floatingAvatar.leftHand.localScale = transform.localScale;
     }
 
-    private void OnRightHandUpdate(Vector3 pos, Quaternion rot)
+    private void OnRightHandUpdate(InputVar<Pose> rightHand)
     {
-        if (ignoringEvents)
+        if (ignoringEvents || !rightHand.valid)
         {
             return;
         }
 
         var transform = GetWorldTransform();
 
-        pos = transform.TransformPoint(pos);
-        rot = transform.rotation * rot;
+        var pos = transform.TransformPoint(rightHand.value.position);
+        var rot = transform.rotation * rightHand.value.rotation;
 
         ignoringEvents = true;
-        threePointTrackedAvatar.OnRightHandUpdate.Invoke(pos,rot);
+        headAndHandsAvatar.OnRightHandUpdate.Invoke(
+            new InputVar<Pose>(new Pose(pos,rot)));
         ignoringEvents = false;
 
         floatingAvatar.rightHand.localScale = transform.localScale;
@@ -146,21 +150,17 @@ public class MazeAvatar : MonoBehaviour
             // We are in the same world - do nothing
             return sameTransform;
         }
-        else
+        
+        if (remoteWorld == World.InsideWorld)
         {
-            if (remoteWorld == World.InsideWorld)
-            {
-                // They are inside, we are outside.
-                // Use the inside scene transform.
-                return insideTransform;
-            }
-            else
-            {
-                // They are outside, we are inside.
-                // Use the inverse of the inside scene transform.
-                return outsideTransform;
-            }
+            // They are inside, we are outside.
+            // Use the inside scene transform.
+            return insideTransform;
         }
+        
+        // They are outside, we are inside.
+        // Use the inverse of the inside scene transform.
+        return outsideTransform;
     }
 
 }

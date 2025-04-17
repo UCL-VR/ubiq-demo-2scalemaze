@@ -225,7 +225,7 @@ public class Box : MonoBehaviour
         return new Vector2Int();
     }
 
-    public Vector3[] getMovable(Tile tile)
+    public bool TryGetMovable(Tile tile, out Vector3 endPointA, out Vector3 endPointB)
     {
         // If a tile is movable, returns the range of free points.
         // Otherwise returns null.
@@ -239,17 +239,15 @@ public class Box : MonoBehaviour
         // This tile can be moved if it is 1 tile away from the free tile.
         if (Mathf.Abs(dif.x) + Mathf.Abs(dif.y) != 1)
         {
-            Debug.Log("WARNING: Not movable tile");
-            return null;
+            endPointA = endPointB = Vector3.zero;
+            return false;
         }
 
         // Compute the range of coordinates between our tile and the free tile.
         // Our tile can be moved within this range.
-        Vector3[] endPoint = new Vector3[2];
-        endPoint[0] = getPosFromIndex(tile.PositionInBox, tile.boxTrans());
-        endPoint[1] = getPosFromIndex(free, tile.boxTrans());
-
-        return endPoint;
+        endPointA = getPosFromIndex(tile.PositionInBox, tile.boxTrans());
+        endPointB = getPosFromIndex(free, tile.boxTrans());
+        return true;
     }
 
     string TileInfo() {
